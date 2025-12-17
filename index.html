@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FTB Nano Banana Maker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e5e5e5;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fde047, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: #737373;
+      margin-bottom: 2rem;
+    }
+
+    /* API Key Section */
+    .api-section {
+      background: #171717;
+      border: 1px solid #262626;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .api-section.connected {
+      border-color: #22c55e;
+    }
+
+    .api-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .api-header h2 {
+      font-size: 0.875rem;
+      color: #a3a3a3;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .api-status {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background: #262626;
+      color: #737373;
+    }
+
+    .api-status.active {
+      background: #14532d;
+      color: #4ade80;
+    }
+
+    .api-input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .api-input-group input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: #0a0a0a;
+      border: 1px solid #404040;
+      border-radius: 8px;
+      color: #e5e5e5;
+      font-size: 0.875rem;
+    }
+
+    .api-input-group input:focus {
+      outline: none;
+      border-color: #fde047;
+    }
+
+    .btn {
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #fde047, #f97316);
+      color: #0a0a0a;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-danger {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background: #991b1b;
+    }
+
+    .btn-secondary {
+      background: #262626;
+      color: #e5e5e5;
+      border: 1px solid #404040;
+    }
+
+    .btn-secondary:hover {
+      background: #333;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Main Section */
+    .main-section {
+      background: #171717;
+      border: 1px solid #262626;
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .prompt-area {
+      margin-bottom: 1.5rem;
+    }
+
+    .prompt-area label {
+      display: block;
+      font-size: 0.875rem;
+      color: #a3a3a3;
+      margin-bottom: 0.5rem;
+    }
+
+    .prompt-area textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 1rem;
+      background: #0a0a0a;
+      border: 1px solid #404040;
+      border-radius: 8px;
+      color: #e5e5e5;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .prompt-area textarea:focus {
+      outline: none;
+      border-color: #fde047;
+    }
+
+    .prompt-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .enhance-btn {
+      background: #1e1b4b;
+      color: #a5b4fc;
+      border: 1px solid #3730a3;
+    }
+
+    .enhance-btn:hover {
+      background: #312e81;
+    }
+
+    .create-btn {
+      background: #14532d;
+      color: #4ade80;
+      border: 1px solid #166534;
+    }
+
+    .create-btn:hover {
+      background: #166534;
+    }
+
+    /* Idea Input */
+    .idea-section {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #262626;
+    }
+
+    .idea-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .idea-row input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: #0a0a0a;
+      border: 1px solid #404040;
+      border-radius: 8px;
+      color: #e5e5e5;
+      font-size: 0.875rem;
+    }
+
+    .idea-row input:focus {
+      outline: none;
+      border-color: #4ade80;
+    }
+
+    .idea-row input::placeholder {
+      color: #525252;
+    }
+
+    /* Model Selection */
+    .model-selection {
+      margin-bottom: 1.5rem;
+    }
+
+    .model-selection label {
+      display: block;
+      font-size: 0.875rem;
+      color: #a3a3a3;
+      margin-bottom: 0.75rem;
+    }
+
+    .model-options {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .model-option {
+      flex: 1;
+      padding: 1rem;
+      background: #0a0a0a;
+      border: 2px solid #404040;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .model-option:hover {
+      border-color: #525252;
+    }
+
+    .model-option.selected {
+      border-color: #fde047;
+      background: #1a1a0a;
+    }
+
+    .model-option input {
+      display: none;
+    }
+
+    .model-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .model-desc {
+      font-size: 0.75rem;
+      color: #737373;
+    }
+
+    /* Generate Button */
+    .generate-section {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .btn-generate {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
+
+    /* Output Section */
+    .output-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #262626;
+    }
+
+    .output-section h3 {
+      font-size: 0.875rem;
+      color: #a3a3a3;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .output-content {
+      background: #0a0a0a;
+      border: 1px solid #404040;
+      border-radius: 8px;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .output-content img {
+      max-width: 100%;
+      max-height: 600px;
+      object-fit: contain;
+    }
+
+    .output-placeholder {
+      color: #525252;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      color: #737373;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #262626;
+      border-top-color: #fde047;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #450a0a;
+      border: 1px solid #7f1d1d;
+      color: #fca5a5;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    .text-response {
+      padding: 1rem;
+      color: #a3a3a3;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .model-options {
+        flex-direction: column;
+      }
+      .api-input-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FTB Nano Banana Maker 🍌</h1>
+    <p class="subtitle">Image generation powered by Gemini</p>
+
+    <!-- API Key Section -->
+    <div class="api-section" id="apiSection">
+      <div class="api-header">
+        <h2>API Key</h2>
+        <span class="api-status" id="apiStatus">Not connected</span>
+      </div>
+      <div class="api-input-group" id="apiInputGroup">
+        <input type="password" id="apiKeyInput" placeholder="Enter your Gemini API key">
+        <button class="btn btn-primary" id="saveApiBtn">Save</button>
+      </div>
+      <div class="api-input-group" id="apiConnectedGroup" style="display: none;">
+        <input type="text" value="API key saved" disabled>
+        <button class="btn btn-danger" id="deleteApiBtn">Delete</button>
+      </div>
+    </div>
+
+    <!-- Main Section -->
+    <div class="main-section">
+      <!-- Quick Idea to Prompt -->
+      <div class="idea-section">
+        <label style="display: block; font-size: 0.875rem; color: #a3a3a3; margin-bottom: 0.5rem;">Quick idea</label>
+        <div class="idea-row">
+          <input type="text" id="ideaInput" placeholder="e.g. cat in space, retro diner, mountain sunset...">
+          <button class="btn create-btn" id="createBtn">Create Prompt</button>
+        </div>
+      </div>
+
+      <div class="prompt-area">
+        <label for="promptInput">Full prompt</label>
+        <textarea id="promptInput" placeholder="A cinematic wide shot of a Golden Retriever sprinting through a sunlit park at golden hour. The low sun casts long shadows on the grass."></textarea>
+        <div class="prompt-actions">
+          <button class="btn enhance-btn" id="enhanceBtn">Enhance Prompt</button>
+          <button class="btn btn-secondary" id="clearBtn">Clear</button>
+        </div>
+      </div>
+
+      <div class="model-selection">
+        <label>Select Model</label>
+        <div class="model-options">
+          <label class="model-option selected">
+            <input type="radio" name="model" value="gemini-2.5-flash-image" checked>
+            <div class="model-name">Flash Image</div>
+            <div class="model-desc">gemini-2.5-flash-image &bull; Fast, cost-effective</div>
+          </label>
+          <label class="model-option">
+            <input type="radio" name="model" value="gemini-3-pro-image-preview">
+            <div class="model-name">Pro Image</div>
+            <div class="model-desc">gemini-3-pro-image-preview &bull; Advanced, up to 4K</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="generate-section">
+        <button class="btn btn-primary btn-generate" id="generateBtn" disabled>Generate Image</button>
+      </div>
+
+      <div class="output-section" id="outputSection" style="display: none;">
+        <h3>Generated Image</h3>
+        <div class="output-content" id="outputContent">
+          <div class="output-placeholder">Your image will appear here</div>
+        </div>
+      </div>
+
+      <div class="error-message" id="errorMessage" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Prompting guide best practices (from nano-banana-pro-prompting-guide.md)
+    const PROMPT_ENHANCEMENT_SYSTEM = `You are a prompt enhancement specialist for Nano Banana Pro (Gemini 3 Pro Image), Google's advanced image generation model.
+
+Your job is to take a user's basic prompt and enhance it following these best practices:
+
+## Core Philosophy
+Nano Banana Pro is built on the Gemini 3 Pro reasoning engine. It understands physics, intent, and composition. Talk to it like a Creative Director, not a search engine.
+
+## The Four Pillars:
+1. **Natural Language Over Tags** - Use full sentences, not comma-separated keywords
+2. **Context is King** - Give context so the model can infer artistic decisions
+3. **Specificity & Materiality** - Define textures and materials to avoid the "plastic AI look"
+4. **The "Why"** - Include intended audience/medium when relevant
+
+## Ultimate Prompt Structure:
+1. Subject (Who/What)
+2. Action (Doing what)
+3. Environment (Where)
+4. Lighting/Mood (Time of day, atmosphere)
+5. Technical Specs (Camera angle, style, texture)
+6. Context (Intended audience/medium)
+
+## Keywords for Materiality:
+Use terms like: brushed steel, soft velvet, crumpled paper, matte finish, grainy film texture, etc.
+
+## Rules:
+- NEVER use tag soup like "dog, park, 4k, realistic, sunset"
+- DO write natural sentences
+- Include lighting, mood, and technical details when appropriate
+- Add context about intended use when it would help
+
+Take the user's prompt and enhance it. Return ONLY the enhanced prompt, no explanation.`;
+
+    const PROMPT_CREATION_SYSTEM = `You are a prompt creation specialist for Nano Banana Pro (Gemini 3 Pro Image), Google's advanced image generation model.
+
+Your job is to take a user's basic idea (just a few words) and create a complete, detailed prompt following these best practices:
+
+## Core Philosophy
+Nano Banana Pro is built on the Gemini 3 Pro reasoning engine. It understands physics, intent, and composition. Talk to it like a Creative Director, not a search engine.
+
+## Ultimate Prompt Structure (use this):
+1. Subject (Who/What) - be specific and detailed
+2. Action (Doing what) - add interesting action or pose
+3. Environment (Where) - create an interesting setting
+4. Lighting/Mood (Time of day, atmosphere) - be cinematic
+5. Technical Specs (Camera angle, style, texture) - add film/photo qualities
+6. Context (Intended audience/medium) - suggest a use case
+
+## Keywords for Materiality (use some of these):
+brushed steel, soft velvet, crumpled paper, matte finish, grainy film texture, warm golden light, crisp shadows, bokeh, shallow depth of field, etc.
+
+## Rules:
+- NEVER use tag soup like "dog, park, 4k, realistic, sunset"
+- DO write natural, flowing sentences
+- Be creative and add interesting details the user didn't mention
+- Make it visually compelling and specific
+- Keep it to 2-4 sentences max
+
+Take the user's basic idea and create a complete image generation prompt. Return ONLY the prompt, no explanation.`;
+
+    // DOM Elements
+    const apiSection = document.getElementById('apiSection');
+    const apiStatus = document.getElementById('apiStatus');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const saveApiBtn = document.getElementById('saveApiBtn');
+    const deleteApiBtn = document.getElementById('deleteApiBtn');
+    const apiInputGroup = document.getElementById('apiInputGroup');
+    const apiConnectedGroup = document.getElementById('apiConnectedGroup');
+    const ideaInput = document.getElementById('ideaInput');
+    const createBtn = document.getElementById('createBtn');
+    const promptInput = document.getElementById('promptInput');
+    const enhanceBtn = document.getElementById('enhanceBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const outputSection = document.getElementById('outputSection');
+    const outputContent = document.getElementById('outputContent');
+    const errorMessage = document.getElementById('errorMessage');
+    const modelOptions = document.querySelectorAll('.model-option');
+
+    // State
+    let apiKey = localStorage.getItem('gemini_api_key') || '';
+
+    // Initialize
+    function init() {
+      if (apiKey) {
+        showConnectedState();
+      }
+      updateGenerateButton();
+    }
+
+    function showConnectedState() {
+      apiSection.classList.add('connected');
+      apiStatus.classList.add('active');
+      apiStatus.textContent = 'Connected';
+      apiInputGroup.style.display = 'none';
+      apiConnectedGroup.style.display = 'flex';
+    }
+
+    function showDisconnectedState() {
+      apiSection.classList.remove('connected');
+      apiStatus.classList.remove('active');
+      apiStatus.textContent = 'Not connected';
+      apiInputGroup.style.display = 'flex';
+      apiConnectedGroup.style.display = 'none';
+      apiKeyInput.value = '';
+    }
+
+    function updateGenerateButton() {
+      generateBtn.disabled = !apiKey;
+      enhanceBtn.disabled = !apiKey;
+      createBtn.disabled = !apiKey;
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    function hideError() {
+      errorMessage.style.display = 'none';
+    }
+
+    function getSelectedModel() {
+      return document.querySelector('input[name="model"]:checked').value;
+    }
+
+    // API Key Management
+    saveApiBtn.addEventListener('click', () => {
+      const key = apiKeyInput.value.trim();
+      if (key) {
+        apiKey = key;
+        localStorage.setItem('gemini_api_key', key);
+        showConnectedState();
+        updateGenerateButton();
+      }
+    });
+
+    deleteApiBtn.addEventListener('click', () => {
+      apiKey = '';
+      localStorage.removeItem('gemini_api_key');
+      showDisconnectedState();
+      updateGenerateButton();
+    });
+
+    // Model Selection UI
+    modelOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        modelOptions.forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        option.querySelector('input').checked = true;
+      });
+    });
+
+    // Clear Button
+    clearBtn.addEventListener('click', () => {
+      promptInput.value = '';
+      ideaInput.value = '';
+      hideError();
+    });
+
+    // Create Prompt from Idea
+    createBtn.addEventListener('click', async () => {
+      const idea = ideaInput.value.trim();
+      if (!idea) {
+        showError('Please enter a quick idea');
+        return;
+      }
+
+      hideError();
+      createBtn.disabled = true;
+      createBtn.textContent = 'Creating...';
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: PROMPT_CREATION_SYSTEM }] },
+            contents: [{ parts: [{ text: idea }] }]
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
+
+        const createdPrompt = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (createdPrompt) {
+          promptInput.value = createdPrompt;
+        }
+      } catch (error) {
+        showError(`Creation failed: ${error.message}`);
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Create Prompt';
+      }
+    });
+
+    // Enhance Prompt
+    enhanceBtn.addEventListener('click', async () => {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        showError('Please enter a prompt to enhance');
+        return;
+      }
+
+      hideError();
+      enhanceBtn.disabled = true;
+      enhanceBtn.textContent = 'Enhancing...';
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: PROMPT_ENHANCEMENT_SYSTEM }] },
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
+
+        const enhancedPrompt = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (enhancedPrompt) {
+          promptInput.value = enhancedPrompt;
+        }
+      } catch (error) {
+        showError(`Enhancement failed: ${error.message}`);
+      } finally {
+        enhanceBtn.disabled = false;
+        enhanceBtn.textContent = 'Enhance Prompt';
+      }
+    });
+
+    // Generate Image
+    generateBtn.addEventListener('click', async () => {
+      const prompt = promptInput.value.trim();
+      if (!prompt) {
+        showError('Please enter a prompt');
+        return;
+      }
+
+      hideError();
+      outputSection.style.display = 'block';
+      outputContent.innerHTML = '<div class="loading"><div class="spinner"></div><span>Generating image...</span></div>';
+      generateBtn.disabled = true;
+
+      const model = getSelectedModel();
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseModalities: ['TEXT', 'IMAGE']
+            }
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
+
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        let hasImage = false;
+        let textContent = '';
+
+        outputContent.innerHTML = '';
+
+        for (const part of parts) {
+          if (part.inlineData) {
+            hasImage = true;
+            const img = document.createElement('img');
+            img.src = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+            outputContent.appendChild(img);
+          } else if (part.text) {
+            textContent += part.text;
+          }
+        }
+
+        if (!hasImage && textContent) {
+          outputContent.innerHTML = `<div class="text-response">${textContent}</div>`;
+        } else if (!hasImage && !textContent) {
+          outputContent.innerHTML = '<div class="output-placeholder">No image generated. Try adjusting your prompt.</div>';
+        }
+
+      } catch (error) {
+        showError(`Generation failed: ${error.message}`);
+        outputContent.innerHTML = '<div class="output-placeholder">Generation failed</div>';
+      } finally {
+        generateBtn.disabled = false;
+      }
+    });
+
+    // Initialize
+    init();
+  </script>
+</body>
+</html>
